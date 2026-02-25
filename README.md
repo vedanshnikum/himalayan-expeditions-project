@@ -1,4 +1,4 @@
-# 🏔️ Himalayan Expeditions Data Pipeline
+# 🏔️ Himalayan Expeditions Project
 
 ## Overview
 
@@ -52,11 +52,12 @@ himalayan-expeditions-project/
     0_setup/
       catalog_setup
       data_upload        ← Kaggle → S3 ingestion notebook
-    other/
+    configs/
       config             ← S3 paths and dataset configuration
       credentials        ← API keys (not pushed to GitHub)
   dictionary/
-    data_dictionary      ← Column reference notebook
+    data_dictionary.     ← Column reference notebook
+    dictionary
   LICENSE
   README.md
   .gitignore
