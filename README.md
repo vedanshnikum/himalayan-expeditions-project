@@ -52,6 +52,7 @@ himalayan-expeditions-project/
     0_setup/
       catalog_setup        ← Creates himalaya catalog and bronze/silver/gold schemas
       kaggle_to_s3         ← Pulls from Kaggle API and lands raw CSVs in S3
+    1_bronze                 
       s3_to_bronze         ← Reads from S3 and writes Delta tables to himalaya.bronze
     configs/
       config               ← S3 paths, dataset config, S3 client
