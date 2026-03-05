@@ -50,20 +50,19 @@ Databricks Dashboard
 himalayan-expeditions-project/
   0_scripts/
     0_setup/
-      catalog_setup            ← Creates himalaya catalog and bronze/silver/gold schemas
-      kaggle_to_s3             ← Pulls from Kaggle API and lands raw CSVs in S3
+      catalog_setup        ← Creates himalaya catalog and bronze/silver/gold schemas
+      kaggle_to_s3         ← Pulls from Kaggle API and lands raw CSVs in S3
     1_bronze/
-      s3_to_bronze             ← Reads from S3 and writes Delta tables to himalaya.bronze
+      s3_to_bronze         ← Reads from S3 and writes Delta tables to himalaya.bronze
     2_silver/
-      silver_deaths            ← Cleans and transforms deaths table
+      silver_deaths        ← Cleans and transforms deaths table
       silver_expeditions_exped ← Cleans and transforms expeditions table
-      silver_expeditions_members ← Cleans and transforms members table
-      silver_expeditions_peaks ← Cleans and transforms peaks table
     exploration/
       explore_deaths
       explore_expeditions_exped
       explore_expeditions_members
       explore_expeditions_peaks
+      explore_expeditions_refer
     configs/
       config                   ← S3 paths, dataset config, S3 client
       credentials              ← API keys (not pushed to GitHub)
@@ -97,15 +96,17 @@ Raw datasets pulled from Kaggle using `kagglehub` and written to AWS S3 as UTF-8
 ### ✅ Stage 2 — Bronze
 Raw files read from S3 and written as Delta tables to `himalaya.bronze` in Databricks Unity Catalog. Column names standardised to lowercase with underscores. Ingestion timestamp added to each record. Idempotent — skips tables that already exist.
 
-### ✅ Stage 3 — Silver
-Data cleaned, typed, and transformed per table. Irrelevant columns dropped, date columns cast to DateType, categorical columns consolidated and standardised, column names cleaned and renamed.
+### 🔄 Stage 3 — Silver *(in progress)*
+Data cleaned, typed, deduplicated, and transformed per table. Irrelevant columns dropped, date columns cast to DateType, categorical columns consolidated and standardised.
 
-| Table | Key Transformations |
-|---|---|
-| `silver_deaths` | Date cast, cause of death consolidated into categories, nationality dropped |
-| `silver_expeditions_exped` | 30+ columns dropped, routes/successes/deaths consolidated, dates cast, columns renamed |
-| `silver_expeditions_members` | 40+ columns dropped, name consolidated, dates cast, nationality cleaned, columns renamed |
-| `silver_expeditions_peaks` | 11 columns dropped, types cast, columns renamed |
+**Completed:**
+- `silver_deaths` — date cast, cause of death consolidated into categories, nationality dropped
+- `silver_expeditions_exped` — 30+ columns dropped, routes/successes/deaths consolidated, dates cast, columns renamed
+
+**Remaining:**
+- `silver_expeditions_members`
+- `silver_expeditions_peaks`
+- `silver_expeditions_refer`
 
 ### ⬜ Stage 4 — Gold *(upcoming)*
 Aggregated tables built for the dashboard — survival rates by peak, season, weather conditions, and expedition type. Columns renamed to display-ready title case for dashboard consumption.
@@ -134,9 +135,6 @@ Both the Kaggle → S3 and S3 → Bronze notebooks check whether data already ex
 
 ### Transformations deferred to Silver
 Raw data is never modified at Bronze. All cleaning, consolidation, and restructuring happens in Silver. This means Bronze always reflects the source data exactly, and Silver transformations can be rerun or modified without re-ingesting from S3.
-
-### Reference data excluded from pipeline
-The expedition references table (`refer.csv`) contains bibliographic citations with no analytical value. It is excluded from the pipeline and stored separately in the `references/` folder alongside the data dictionary for documentation purposes only.
 
 ### Config separated from code
 All dataset paths, Kaggle IDs, and S3 configuration live in a dedicated `config` notebook. Ingestion logic never needs to change if a path or source changes — only the config does. Credentials are stored separately and excluded from version control entirely.
