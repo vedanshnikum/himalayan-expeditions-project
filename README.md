@@ -64,11 +64,13 @@ himalayan-expeditions-project/
       explore_expeditions_peaks
       explore_expeditions_refer
     configs/
-      config               ← S3 paths, dataset config, S3 client
-      credentials          ← API keys (not pushed to GitHub)
-  dictionary/
-    himalayan_data_dictionary.csv
-    data_dictionary        ← Renders data dictionary as interactive table
+      config                   ← S3 paths, dataset config, S3 client
+      credentials              ← API keys (not pushed to GitHub)
+  references/
+    refer_data
+      data_dictionary            ← Column reference for all tables
+      refer_data                 ← Source citations and bibliography
+    refer_display
   README.md
   .gitignore
 ```
@@ -123,7 +125,7 @@ Data is loaded to S3 raw before any transformation occurs. Raw data is always pr
 A dedicated IAM user was created for this project rather than using the AWS root account. Root credentials should never be used in application code. The IAM user has scoped S3 permissions, meaning if credentials were ever compromised, the blast radius is limited to this project only.
 
 ### Encoding standardised at ingestion
-`refer.csv` contained Latin-1 encoded characters causing codec errors on read. Rather than handling this in Silver or later, re-encoding to UTF-8 happens immediately at ingestion before the file lands in S3. Every layer downstream works with consistent UTF-8 data.
+Source files contained Latin-1 encoded characters causing codec errors on read. Rather than handling this in Silver or later, re-encoding to UTF-8 happens immediately at ingestion before files land in S3. Every layer downstream works with consistent UTF-8 data.
 
 ### Column names standardised at Bronze
 Source data contained column names with spaces and special characters which Delta Lake does not support. All column names are lowercased and non-alphanumeric characters replaced with underscores at Bronze ingestion, ensuring consistent naming across all downstream layers.
