@@ -52,8 +52,17 @@ himalayan-expeditions-project/
     0_setup/
       catalog_setup        ← Creates himalaya catalog and bronze/silver/gold schemas
       kaggle_to_s3         ← Pulls from Kaggle API and lands raw CSVs in S3
-    1_bronze                 
+    1_bronze/
       s3_to_bronze         ← Reads from S3 and writes Delta tables to himalaya.bronze
+    2_silver/
+      silver_deaths        ← Cleans and transforms deaths table
+      silver_expeditions_exped ← Cleans and transforms expeditions table
+    exploration/
+      explore_deaths
+      explore_expeditions_exped
+      explore_expeditions_members
+      explore_expeditions_peaks
+      explore_expeditions_refer
     configs/
       config               ← S3 paths, dataset config, S3 client
       credentials          ← API keys (not pushed to GitHub)
@@ -85,11 +94,20 @@ Raw datasets pulled from Kaggle using `kagglehub` and written to AWS S3 as UTF-8
 ### ✅ Stage 2 — Bronze
 Raw files read from S3 and written as Delta tables to `himalaya.bronze` in Databricks Unity Catalog. Column names standardised to lowercase with underscores. Ingestion timestamp added to each record. Idempotent — skips tables that already exist.
 
-### ⬜ Stage 3 — Silver *(upcoming)*
-Data cleaned, typed, deduplicated, and joined into a unified analytical layer.
+### 🔄 Stage 3 — Silver *(in progress)*
+Data cleaned, typed, deduplicated, and transformed per table. Irrelevant columns dropped, date columns cast to DateType, categorical columns consolidated and standardised.
+
+**Completed:**
+- `silver_deaths` — date cast, cause of death consolidated into categories, nationality dropped
+- `silver_expeditions_exped` — 30+ columns dropped, routes/successes/deaths consolidated, dates cast, columns renamed
+
+**Remaining:**
+- `silver_expeditions_members`
+- `silver_expeditions_peaks`
+- `silver_expeditions_refer`
 
 ### ⬜ Stage 4 — Gold *(upcoming)*
-Aggregated tables built for the dashboard — survival rates by peak, season, weather conditions, and expedition type.
+Aggregated tables built for the dashboard — survival rates by peak, season, weather conditions, and expedition type. Columns renamed to display-ready title case for dashboard consumption.
 
 ### ⬜ Stage 5 — Dashboard *(upcoming)*
 Interactive visualisation and natural language querying via Databricks Dashboard and Genie.
@@ -113,6 +131,9 @@ Source data contained column names with spaces and special characters which Delt
 ### Idempotent ingestion
 Both the Kaggle → S3 and S3 → Bronze notebooks check whether data already exists before writing. This means both notebooks can be rerun safely at any time without duplicating data.
 
+### Transformations deferred to Silver
+Raw data is never modified at Bronze. All cleaning, consolidation, and restructuring happens in Silver. This means Bronze always reflects the source data exactly, and Silver transformations can be rerun or modified without re-ingesting from S3.
+
 ### Config separated from code
 All dataset paths, Kaggle IDs, and S3 configuration live in a dedicated `config` notebook. Ingestion logic never needs to change if a path or source changes — only the config does. Credentials are stored separately and excluded from version control entirely.
 
@@ -125,4 +146,5 @@ All dataset paths, Kaggle IDs, and S3 configuration live in a dedicated `config`
 3. Update `config` notebook with your S3 bucket name
 4. Run `0_scripts/0_setup/catalog_setup` to create the Databricks catalog and schemas
 5. Run `0_scripts/0_setup/kaggle_to_s3` to ingest raw data into S3
-6. Run `0_scripts/0_setup/s3_to_bronze` to load Bronze Delta tables
+6. Run `0_scripts/1_bronze/s3_to_bronze` to load Bronze Delta tables
+7. Run Silver notebooks in `0_scripts/2_silver/` to clean and transform each table
