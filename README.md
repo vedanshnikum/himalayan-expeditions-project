@@ -36,7 +36,7 @@ AWS S3 (raw layer)
     ↓
 Bronze (raw Delta tables)
     ↓
-Silver (cleaned and joined)
+Silver (cleaned and transformed)
     ↓
 Gold (aggregated, dashboard-ready)
     ↓
@@ -65,6 +65,14 @@ himalayan-expeditions-project/
         silver_expeditions_peaks ← Cleans and transforms peaks table
       incremental/
         silver_weather           ← Cleans and merges weather data into himalaya.silver.weather
+    3_gold/
+      gold_dim_peaks             ← Peak reference dimension
+      gold_dim_weather           ← Daily weather dimension (incremental)
+      gold_dim_members           ← Climber dimension
+      gold_dim_deaths            ← Deaths dimension
+      gold_fact_expeditions      ← Core fact table, one row per expedition
+    4_dashboarding/
+      views                      ← SQL views for dashboard consumption
     exploration/
       explore_deaths
       explore_expeditions_exped
@@ -111,13 +119,21 @@ Data cleaned, typed, and transformed per table. Irrelevant columns dropped, date
 | `silver_expeditions_exped` | 30+ columns dropped, routes/successes/deaths consolidated, dates cast, columns renamed |
 | `silver_expeditions_members` | 40+ columns dropped, name consolidated, dates cast, nationality cleaned, columns renamed |
 | `silver_expeditions_peaks` | 11 columns dropped, types cast, columns renamed |
-| `silver_weather` | 9 columns dropped, date cast, columns renamed, incremental merge |
+| `silver_weather` | 9 columns dropped, hourly aggregated to daily, date cast, columns renamed, incremental merge |
 
-### ⬜ Stage 4 — Gold *(upcoming)*
-Aggregated tables built for the dashboard — survival rates by peak, season, weather conditions, and expedition type. Columns renamed to display-ready title case for dashboard consumption.
+### ✅ Stage 4 — Gold
+Snowflake schema with one fact table and four dimension tables. All tables sourced from Silver. Weather dimension is updated incrementally as new peak batches arrive.
 
-### ⬜ Stage 5 — Dashboard *(upcoming)*
-Interactive visualisation and natural language querying via Databricks Dashboard and Genie.
+| Table | Description |
+|---|---|
+| `fact_expeditions` | One row per expedition — outcomes, metrics, weather_id key |
+| `dim_peaks` | Peak reference data — height, region, first ascent details |
+| `dim_weather` | Daily weather per peak — temperature, wind, snowfall, conditions |
+| `dim_members` | One row per climber — nationality, role, success, death boolean |
+| `dim_deaths` | Death records enriched with peak and expedition context |
+
+### ✅ Stage 5 — Dashboard
+Interactive visualisation via Databricks Dashboard and natural language querying via Genie. SQL views built in `4_dashboarding/views` for dashboard consumption.
 
 ---
 
@@ -131,6 +147,9 @@ A dedicated IAM user was created for this project rather than using the AWS root
 
 ### Full load vs incremental ingestion
 Expedition and deaths datasets are static historical records loaded once from Kaggle. Weather data is ingested incrementally — new peak files are uploaded to S3 landing in batches, processed into Bronze, and merged into Silver. This simulates a real-world pipeline where new data arrives over time.
+
+### Snowflake schema in Gold
+Gold follows a snowflake schema with `fact_expeditions` at the center referencing four dimension tables. `dim_deaths` is a child dimension of `dim_members`, linking via name and peakid. This structure supports flexible dashboard queries while maintaining clear separation of concerns between expedition outcomes, climber details, peak metadata, and weather conditions.
 
 ### Staging tables for incremental processing
 Each incremental weather batch is written to a staging table in Bronze before Silver processing. Silver reads only the staging table rather than the full Bronze weather table, ensuring efficient processing regardless of how large the historical weather data grows.
@@ -166,3 +185,5 @@ All dataset paths, Kaggle IDs, and S3 configuration live in a dedicated `config`
 7. Upload weather parquet files to `s3://himalaya-dp-vn/raw/incremental_load/historic-weather-data/landing/`
 8. Run `0_scripts/1_bronze/incremental/weather_to_bronze` to ingest weather batch
 9. Run Silver notebooks in `0_scripts/2_silver/` to clean and transform each table
+10. Run Gold notebooks in `0_scripts/3_gold/` to build dimension and fact tables
+11. Run `0_scripts/4_dashboarding/views` to create dashboard views
