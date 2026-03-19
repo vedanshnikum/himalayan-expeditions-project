@@ -1,74 +1,25 @@
 {
   "datasets": [
     {
-      "name": "e83001b6",
-      "displayName": "vw_deaths",
+      "name": "0008342d",
+      "displayName": "vw_expeditions",
       "queryLines": [
-        "SELECT * FROM himalaya.gold.vw_deaths"
-      ],
-      "catalog": "himalaya",
-      "schema": "gold"
+        "SELECT * FROM himalaya.gold.vw_expeditions"
+      ]
     },
     {
-      "name": "10f5fc96",
-      "displayName": "vw_master_expeditions",
-      "queryLines": [
-        "SELECT * FROM himalaya.gold.vw_master_expeditions"
-      ],
-      "catalog": "himalaya",
-      "schema": "gold"
-    },
-    {
-      "name": "b6de1eea",
-      "displayName": "vw_master_members",
-      "queryLines": [
-        "SELECT * FROM himalaya.gold.vw_master_members"
-      ],
-      "catalog": "himalaya",
-      "schema": "gold"
-    },
-    {
-      "name": "300ba129",
+      "name": "419b4f24",
       "displayName": "vw_members",
       "queryLines": [
         "SELECT * FROM himalaya.gold.vw_members"
-      ],
-      "catalog": "himalaya",
-      "schema": "gold"
-    },
-    {
-      "name": "5d17f797",
-      "displayName": "vw_overview",
-      "queryLines": [
-        "SELECT * FROM himalaya.gold.vw_overview"
-      ],
-      "catalog": "himalaya",
-      "schema": "gold"
-    },
-    {
-      "name": "84d5dcd7",
-      "displayName": "vw_peaks",
-      "queryLines": [
-        "SELECT * FROM himalaya.gold.vw_peaks"
-      ],
-      "catalog": "himalaya",
-      "schema": "gold"
-    },
-    {
-      "name": "bc774ca9",
-      "displayName": "vw_weather",
-      "queryLines": [
-        "SELECT * FROM himalaya.gold.vw_weather"
-      ],
-      "catalog": "himalaya",
-      "schema": "gold"
+      ]
     },
     {
       "name": "73de7c13",
       "displayName": "Average Success Rate",
       "queryLines": [
         "SELECT ROUND(SUM(CASE WHEN `Success` = true THEN 1 ELSE 0 END) / NULLIF(COUNT(`Expedition ID`), 0), 3) AS `Average Success Rate (%)`\n",
-        "FROM himalaya.gold.vw_overview"
+        "FROM himalaya.gold.vw_expeditions"
       ]
     },
     {
@@ -76,7 +27,7 @@
       "displayName": "Date Range",
       "queryLines": [
         "SELECT CONCAT(MIN(`Year`), ' — ', MAX(`Year`)) AS `Years of Data`\n",
-        "FROM himalaya.gold.vw_overview"
+        "FROM himalaya.gold.vw_expeditions"
       ]
     },
     {
@@ -87,7 +38,7 @@
         "    `Year`,\n",
         "    COUNT(DISTINCT CASE WHEN `Success` = true THEN `Expedition ID` END) AS `Successes`,\n",
         "    COUNT(DISTINCT CASE WHEN `Success` = false THEN `Expedition ID` END) AS `Failures`\n",
-        "FROM himalaya.gold.vw_overview\n",
+        "FROM himalaya.gold.vw_expeditions\n",
         "GROUP BY `Year`\n",
         "ORDER BY `Year`"
       ]
@@ -103,7 +54,7 @@
         "    `First Ascent Country`,\n",
         "    `First Ascent Members`,\n",
         "    `Height (m)`\n",
-        "FROM himalaya.gold.vw_overview\n",
+        "FROM himalaya.gold.vw_expeditions\n",
         "WHERE `First Ascent Year` IS NOT NULL\n",
         "ORDER BY `First Ascent Year` ASC\n",
         "LIMIT 1"
@@ -116,7 +67,7 @@
       "displayName": "Most Expeditions",
       "queryLines": [
         "SELECT `Mountain`, COUNT(DISTINCT `Expedition ID`) AS `Total Expeditions`\n",
-        "FROM himalaya.gold.vw_overview\n",
+        "FROM himalaya.gold.vw_expeditions\n",
         "GROUP BY `Mountain`\n",
         "ORDER BY `Total Expeditions` DESC\n",
         "LIMIT 1"
@@ -133,9 +84,9 @@
             "name": "0f59ead9",
             "queries": [
               {
-                "name": "dashboards/01f122e164fc1ab38d9e3fbcc04250da/datasets/01f1230d054b1f2d9b790e4499a12933_Year",
+                "name": "dashboards/01f122e164fc1ab38d9e3fbcc04250da/datasets/01f123a301211e599ae74c0751f32a2e_Year",
                 "query": {
-                  "datasetName": "5d17f797",
+                  "datasetName": "0008342d",
                   "fields": [
                     {
                       "name": "min(Year)",
@@ -160,7 +111,7 @@
                 "fields": [
                   {
                     "fieldName": "Year",
-                    "queryName": "dashboards/01f122e164fc1ab38d9e3fbcc04250da/datasets/01f1230d054b1f2d9b790e4499a12933_Year"
+                    "queryName": "dashboards/01f122e164fc1ab38d9e3fbcc04250da/datasets/01f123a301211e599ae74c0751f32a2e_Year"
                   }
                 ]
               }
@@ -178,9 +129,9 @@
             "name": "79b5600c",
             "queries": [
               {
-                "name": "dashboards/01f122e164fc1ab38d9e3fbcc04250da/datasets/01f1230d054b1f2d9b790e4499a12933_Season",
+                "name": "dashboards/01f122e164fc1ab38d9e3fbcc04250da/datasets/01f123a301211e599ae74c0751f32a2e_Season",
                 "query": {
-                  "datasetName": "5d17f797",
+                  "datasetName": "0008342d",
                   "fields": [
                     {
                       "name": "Season",
@@ -205,7 +156,7 @@
                 "fields": [
                   {
                     "fieldName": "Season",
-                    "queryName": "dashboards/01f122e164fc1ab38d9e3fbcc04250da/datasets/01f1230d054b1f2d9b790e4499a12933_Season"
+                    "queryName": "dashboards/01f122e164fc1ab38d9e3fbcc04250da/datasets/01f123a301211e599ae74c0751f32a2e_Season"
                   }
                 ]
               }
@@ -233,7 +184,7 @@
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "5d17f797",
+                  "datasetName": "0008342d",
                   "fields": [
                     {
                       "name": "countdistinct(Expedition ID)",
@@ -283,7 +234,7 @@
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "5d17f797",
+                  "datasetName": "0008342d",
                   "fields": [
                     {
                       "name": "sum(Deaths)",
@@ -330,7 +281,7 @@
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "5d17f797",
+                  "datasetName": "0008342d",
                   "fields": [
                     {
                       "name": "countdistinct(Mountain)",
@@ -415,7 +366,7 @@
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "300ba129",
+                  "datasetName": "419b4f24",
                   "fields": [
                     {
                       "name": "countdistinct(Name)",
@@ -477,7 +428,7 @@
               "version": 2,
               "frame": {
                 "showTitle": true,
-                "title": "Date Range"
+                "title": "Year Range in Records"
               },
               "widgetType": "counter",
               "encodings": {
@@ -504,7 +455,7 @@
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "5d17f797",
+                  "datasetName": "0008342d",
                   "fields": [
                     {
                       "name": "Year",
@@ -690,7 +641,7 @@
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "5d17f797",
+                  "datasetName": "0008342d",
                   "fields": [
                     {
                       "name": "countdistinct(Expedition ID)",
@@ -755,7 +706,7 @@
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "5d17f797",
+                  "datasetName": "0008342d",
                   "fields": [
                     {
                       "name": "countdistinct(Expedition ID)",
@@ -848,7 +799,7 @@
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "5d17f797",
+                  "datasetName": "0008342d",
                   "fields": [
                     {
                       "name": "Year",
@@ -1127,6 +1078,12 @@
           }
         }
       ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "b82cc433",
+      "displayName": "Peak Analysis",
       "pageType": "PAGE_TYPE_CANVAS",
       "layoutVersion": "GRID_V1"
     }
