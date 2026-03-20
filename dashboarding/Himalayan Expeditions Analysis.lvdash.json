@@ -4,7 +4,7 @@
       "name": "0008342d",
       "displayName": "vw_expeditions",
       "queryLines": [
-        "SELECT * FROM himalaya.gold.vw_expeditions "
+        "SELECT * FROM himalaya.gold.vw_expeditions"
       ]
     },
     {
@@ -312,6 +312,53 @@
         "  AND `Cause of Death` != 'Unknown'\n",
         "GROUP BY `Situation Detail`, `Cause of Death`\n",
         "ORDER BY `Situation` DESC, `Situation Detail`, `Cause of Death`"
+      ]
+    },
+    {
+      "name": "9117656d",
+      "displayName": "Most Common Weather Condition",
+      "queryLines": [
+        "SELECT MODE(`Weather Condition`) AS `Most Common Weather Condition`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "WHERE `Weather Condition` IS NOT NULL"
+      ]
+    },
+    {
+      "name": "d78baaf2",
+      "displayName": "Success Rate by Weather Condition",
+      "queryLines": [
+        "SELECT `Weather Condition`,\n",
+        "    ROUND(AVG(CASE WHEN `Success` = true THEN 1.0 ELSE 0.0 END), 2) AS `Success Rate %`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "WHERE `Weather Condition` IS NOT NULL\n",
+        "GROUP BY `Weather Condition`\n",
+        "ORDER BY `Success Rate %` DESC"
+      ]
+    },
+    {
+      "name": "9daeb24f",
+      "displayName": "Death Rate by Weather Condition",
+      "queryLines": [
+        "SELECT `Weather Condition`,\n",
+        "    SUM(`Deaths`) AS `Total Deaths`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "WHERE `Weather Condition` IS NOT NULL\n",
+        "GROUP BY `Weather Condition`\n",
+        "ORDER BY `Total Deaths` DESC"
+      ]
+    },
+    {
+      "name": "b1cfba84",
+      "displayName": "Snowfall vs success rate",
+      "queryLines": [
+        "SELECT \n",
+        "    `Snowfall (cm)`,\n",
+        "    ROUND(AVG(CASE WHEN `Success` = true THEN 1.0 ELSE 0.0 END) * 100, 2) AS `Success Rate %`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "WHERE `Snowfall (cm)` IS NOT NULL\n",
+        "  AND `Weather Condition` IS NOT NULL\n",
+        "GROUP BY `Snowfall (cm)`\n",
+        "ORDER BY `Snowfall (cm)`"
       ]
     }
   ],
@@ -1207,7 +1254,7 @@
             "name": "a74fc165",
             "multilineTextboxSpec": {
               "lines": [
-                "## <span style=\"text-align:center;display:block\"><span style=\"text-decoration:underline;font-size:24px\">Summary</span></span>"
+                "## <span style=\"text-align:center;display:block\"><span style=\"text-decoration: underline;font-size: 24px;\">**O</span><span style=\"text-decoration: underline;\">verview**</span></span>"
               ]
             },
             "specExtensions": {
@@ -1586,7 +1633,7 @@
             "name": "34516e22",
             "multilineTextboxSpec": {
               "lines": [
-                "## <span style=\"text-align:center;display:block\"><span style=\"text-decoration:underline;font-size:24px\">Mountains Information</span></span>"
+                "## <span style=\"text-align:center;display:block\"><span style=\"text-decoration:underline;font-size:24px\">Mountain Information</span></span>"
               ]
             },
             "specExtensions": {
@@ -1966,7 +2013,7 @@
                     "type": "quantitative",
                     "colorRamp": {
                       "mode": "scheme",
-                      "scheme": "spectral"
+                      "scheme": "reds"
                     }
                   }
                 },
@@ -2328,7 +2375,7 @@
     },
     {
       "name": "493dcd3c",
-      "displayName": "Expedition Info",
+      "displayName": "Expedition Analysis",
       "layout": [
         {
           "widget": {
@@ -3372,7 +3419,7 @@
             "name": "79b79d53",
             "multilineTextboxSpec": {
               "lines": [
-                "## <span style=\"text-align:center;display:block\"><span style=\"text-decoration:underline;font-size:24px\">Deaths</span></span>"
+                "## <span style=\"text-align:center;display:block\"><span style=\"text-decoration: underline;font-size: 24px;\">Deaths</span><span style=\"text-decoration: underline;\"> Analysis</span></span>"
               ]
             },
             "specExtensions": {
@@ -3933,6 +3980,625 @@
     {
       "name": "9b9d8a76",
       "displayName": "Weather Analysis",
+      "layout": [
+        {
+          "widget": {
+            "name": "85ba2b7c",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "9117656d",
+                  "fields": [
+                    {
+                      "name": "Most Common Weather Condition",
+                      "expression": "`Most Common Weather Condition`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Most Common Weather Condition"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Most Common Weather Condition"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "7ea3e4bb",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "avg(Temperature (°C))",
+                      "expression": "AVG(`Temperature (°C)`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Average Temperature (°C)"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(Temperature (°C))",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 0,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "440331da",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "avg(Wind Speed (km/h))",
+                      "expression": "AVG(`Wind Speed (km/h)`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Avg Wind Speed (km/h)"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(Wind Speed (km/h))",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 0,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "success-rate-by-weather-condition",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d78baaf2",
+                  "fields": [
+                    {
+                      "name": "Weather Condition",
+                      "expression": "`Weather Condition`"
+                    },
+                    {
+                      "name": "Success Rate %",
+                      "expression": "`Success Rate %`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Success Rate by Weather Condition"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Weather Condition",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "Success Rate %",
+                  "axis": {
+                    "title": "Success Rate"
+                  },
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Weather Condition",
+                  "legend": {
+                    "hide": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "deaths-by-weather-condition",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "9daeb24f",
+                  "fields": [
+                    {
+                      "name": "Weather Condition",
+                      "expression": "`Weather Condition`"
+                    },
+                    {
+                      "name": "Total Deaths",
+                      "expression": "`Total Deaths`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Deaths by Weather Condition"
+              },
+              "mark": {
+                "layout": "stack"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Weather Condition",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "Total Deaths",
+                  "axis": {
+                    "title": "Death Rate"
+                  },
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 3
+                    },
+                    "significantFigures": {
+                      "type": "max",
+                      "figures": 3
+                    }
+                  },
+                  "displayName": "Death Count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Weather Condition",
+                  "legend": {
+                    "hide": true
+                  },
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 3,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "table-death-rate-weather-condition",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "Year",
+                      "expression": "`Year`"
+                    },
+                    {
+                      "name": "avg(Temperature (°C))",
+                      "expression": "AVG(`Temperature (°C)`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Average temperature by year"
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "Year",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "avg(Temperature (°C))",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "average-wind-speed-by-year",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "Year",
+                      "expression": "`Year`"
+                    },
+                    {
+                      "name": "avg(Wind Speed (km/h))",
+                      "expression": "AVG(`Wind Speed (km/h)`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Average Wind Speed by Year"
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "Year",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "avg(Wind Speed (km/h))",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 9,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "wind-speed-highest-point-reached",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "Success",
+                      "expression": "`Success`"
+                    },
+                    {
+                      "name": "Wind Speed (km/h)",
+                      "expression": "`Wind Speed (km/h)`"
+                    },
+                    {
+                      "name": "Highest Point (m)",
+                      "expression": "`Highest Point (m)`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Wind Speed and Highest Point Reached"
+              },
+              "widgetType": "scatter",
+              "encodings": {
+                "x": {
+                  "fieldName": "Wind Speed (km/h)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "Highest Point (m)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Success",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": false,
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 4
+                        }
+                      },
+                      {
+                        "value": true,
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 3
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 15,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "temperature-highest-point-reached",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "Success",
+                      "expression": "`Success`"
+                    },
+                    {
+                      "name": "Temperature (°C)",
+                      "expression": "`Temperature (°C)`"
+                    },
+                    {
+                      "name": "Highest Point (m)",
+                      "expression": "`Highest Point (m)`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Temperatue and Highest Point Reached"
+              },
+              "widgetType": "scatter",
+              "encodings": {
+                "x": {
+                  "fieldName": "Temperature (°C)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "Highest Point (m)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Success",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": false,
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 4
+                        }
+                      },
+                      {
+                        "value": true,
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 3
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 15,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "0cd74174",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "b1cfba84",
+                  "fields": [
+                    {
+                      "name": "Success Rate %",
+                      "expression": "`Success Rate %`"
+                    },
+                    {
+                      "name": "Snowfall (cm)",
+                      "expression": "`Snowfall (cm)`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "scatter",
+              "encodings": {
+                "x": {
+                  "fieldName": "Snowfall (cm)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "Success Rate %",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Success Rate %",
+                  "scale": {
+                    "type": "quantitative",
+                    "colorRamp": {
+                      "mode": "scheme",
+                      "scheme": "greens"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 21,
+            "width": 12,
+            "height": 8
+          }
+        }
+      ],
       "pageType": "PAGE_TYPE_CANVAS",
       "layoutVersion": "GRID_V1"
     }
