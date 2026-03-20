@@ -358,6 +358,17 @@
         "GROUP BY `Snowfall (cm)`\n",
         "ORDER BY `Snowfall (cm)`"
       ]
+    },
+    {
+      "name": "071c43d7",
+      "displayName": "True Average",
+      "queryLines": [
+        "SELECT \n",
+        "    ROUND(SUM(`Deaths`) / NULLIF(SUM(`Total Members`), 0), 2) AS `Death Rate %`\n",
+        "FROM himalaya.gold.vw_expeditions"
+      ],
+      "catalog": "himalaya",
+      "schema": "gold"
     }
   ],
   "pages": [
@@ -3227,7 +3238,7 @@
               },
               "frame": {
                 "showTitle": true,
-                "title": "Success rate with Sherpas"
+                "title": "Success Rate by Hired Status"
               },
               "widgetType": "histogram",
               "encodings": {
@@ -3306,7 +3317,7 @@
               },
               "frame": {
                 "showTitle": true,
-                "title": "Success Rate with Oxygen"
+                "title": "Success Rate by Oxygen"
               },
               "widgetType": "histogram",
               "encodings": {
@@ -3731,11 +3742,11 @@
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "0008342d",
+                  "datasetName": "071c43d7",
                   "fields": [
                     {
-                      "name": "avg(Deaths)",
-                      "expression": "AVG(`Deaths`)"
+                      "name": "avg(Death Rate %)",
+                      "expression": "AVG(`Death Rate %`)"
                     }
                   ],
                   "disaggregated": false
@@ -3746,12 +3757,12 @@
               "version": 2,
               "frame": {
                 "showTitle": true,
-                "title": "Chance of Death in Expeditions"
+                "title": "Avg Deaths Per Expedition"
               },
               "widgetType": "counter",
               "encodings": {
                 "value": {
-                  "fieldName": "avg(Deaths)",
+                  "fieldName": "avg(Death Rate %)",
                   "format": {
                     "type": "number-percent",
                     "decimalPlaces": {
@@ -4231,7 +4242,7 @@
                 "y": {
                   "fieldName": "Total Deaths",
                   "axis": {
-                    "title": "Death Rate"
+                    "title": "Death Count"
                   },
                   "format": {
                     "type": "number-plain",
@@ -4487,7 +4498,7 @@
               "version": 3,
               "frame": {
                 "showTitle": true,
-                "title": "Temperatue and Highest Point Reached"
+                "title": "Temperature and Highest Point Reached"
               },
               "widgetType": "scatter",
               "encodings": {
