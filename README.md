@@ -29,6 +29,7 @@ Incremental weather data is simulated by uploading historic weather files in bat
 ## 🏗️ Architecture
 
 This project follows a **Data Lakehouse** pattern with **Medallion Architecture** (Bronze → Silver → Gold).
+
 ```
 Kaggle API
     ↓
@@ -46,9 +47,10 @@ Databricks Dashboard
 ---
 
 ## 📂 Repository Structure
+
 ```
 himalayan-expeditions-project/
-  0_scripts/
+  scripts/
     0_setup/
       catalog_setup              ← Creates himalaya catalog and bronze/silver/gold schemas
       kaggle_to_s3               ← Pulls from Kaggle API and lands raw CSVs in S3
@@ -71,21 +73,22 @@ himalayan-expeditions-project/
       gold_dim_members           ← Climber dimension
       gold_dim_deaths            ← Deaths dimension
       gold_fact_expeditions      ← Core fact table, one row per expedition
-    4_dashboarding/
-      views                      ← SQL views for dashboard consumption
     exploration/
       explore_deaths
       explore_expeditions_exped
       explore_expeditions_members
       explore_expeditions_peaks
       explore_weather
-    configs/
-      config                     ← S3 paths, dataset config
-      credentials                ← API keys (not pushed to GitHub)
+  dashboarding/
+    views                        ← SQL views for dashboard consumption
+  configs/
+    config                       ← S3 paths, dataset config
+    credentials                  ← API keys (not pushed to GitHub)
   references/
     data_dictionary              ← Column reference for all tables
     refer                        ← Source citations and bibliography
   README.md
+  LICENSE
   .gitignore
 ```
 
@@ -98,7 +101,6 @@ himalayan-expeditions-project/
 | [Mountain Climbing Accidents Dataset](https://www.kaggle.com/datasets/asaniczka/mountain-climbing-accidents-dataset) | asaniczka | 2024 |
 | [Historic Weather Data for Himalayan Peaks](https://www.kaggle.com/datasets/bonesclarke26/historic-weather-data-for-himalayan-peaks) | Ryan Clarke | 2025 |
 | [Himalayan Expeditions](https://www.kaggle.com/datasets/siddharth0935/himalayan-expeditions) | Siddharth Vora | 2025 |
-| [Mount Everest Accident Dataset 2020–2025](https://www.kaggle.com/datasets/syedmuhammadbilal12/mount-everest-accident-dataset-2020-2025) | Syed Muhammad Bilal | 2026 |
 
 ---
 
@@ -132,8 +134,28 @@ Snowflake schema with one fact table and four dimension tables. All tables sourc
 | `dim_members` | One row per climber — nationality, role, success, death boolean |
 | `dim_deaths` | Death records enriched with peak and expedition context |
 
-### ✅ Stage 5 — Dashboard
-Interactive visualisation via Databricks Dashboard and natural language querying via Genie. SQL views built in `4_dashboarding/views` for dashboard consumption.
+### ✅ Stage 5 — Dashboarding
+Interactive visualisation via Databricks Dashboard and natural language querying via Databricks Genie. SQL views built in `dashboarding/views` serve as the consumption layer for all dashboard pages.
+
+The dashboard is split into five pages, each surfacing a different analytical lens:
+
+**Overview**
+High-level summary of the full dataset — total expeditions, deaths, mountains, members, average success rate, and year range. Includes trend lines for expeditions by year, success vs failure by year, most climbed peaks, expeditions by season, and a combined expeditions vs deaths chart over time.
+
+**Mountain Info**
+Per-mountain breakdowns including the highest, hardest (lowest success rate among summited peaks), most climbed, and deadliest mountains. Charts cover average success rate by mountain, average death rate by mountain, average oxygen usage by mountain, expeditions per mountain, and regional distribution of peaks across the Himalayas.
+
+**Member Info**
+Climber-level analysis including a choropleth map of member nationalities, sex breakdown, youngest and oldest climbers (name, nationality, age), and leader age comparison against non-leaders.
+
+**Expedition Analysis**
+Deeper expedition-level exploration including termination reasons, success rate by season, success rate with vs without hired staff, success rate with vs without oxygen, expedition counts by season, most expeditions by an individual, and the most leaders recorded in a single expedition.
+
+**Death Analysis**
+Fatality analysis including total deaths, deadliest mountain, deaths per year, deaths by oxygen status, deaths by Sherpa status, most deaths in a single expedition, and a Sankey diagram showing how deaths break down by oxygen/hired status through to cause of death.
+
+**Weather Analysis**
+Weather impact on climbing outcomes — most common weather condition, average temperature and wind speed across all records, success rate by weather condition, deaths by weather condition, average temperature and wind speed trends by year, scatter plots of wind speed and temperature against highest point reached, and snowfall vs success rate.
 
 ---
 
@@ -177,13 +199,13 @@ All dataset paths, Kaggle IDs, and S3 configuration live in a dedicated `config`
 ## ⚙️ Setup
 
 1. Clone the repo
-2. Create a `credentials` notebook in `0_scripts/configs/` with your Kaggle and AWS keys
+2. Create a `credentials` notebook in `configs/` with your Kaggle and AWS keys
 3. Update `config` notebook with your S3 bucket name
-4. Run `0_scripts/0_setup/catalog_setup` to create the Databricks catalog and schemas
-5. Run `0_scripts/0_setup/kaggle_to_s3` to ingest raw data into S3
-6. Run `0_scripts/1_bronze/full_load/s3_to_bronze` to load Bronze Delta tables
+4. Run `scripts/0_setup/catalog_setup` to create the Databricks catalog and schemas
+5. Run `scripts/0_setup/kaggle_to_s3` to ingest raw data into S3
+6. Run `scripts/1_bronze/full_load/s3_to_bronze` to load Bronze Delta tables
 7. Upload weather parquet files to `s3://himalaya-dp-vn/raw/incremental_load/historic-weather-data/landing/`
-8. Run `0_scripts/1_bronze/incremental/weather_to_bronze` to ingest weather batch
-9. Run Silver notebooks in `0_scripts/2_silver/` to clean and transform each table
-10. Run Gold notebooks in `0_scripts/3_gold/` to build dimension and fact tables
-11. Run `0_scripts/4_dashboarding/views` to create dashboard views
+8. Run `scripts/1_bronze/incremental/weather_to_bronze` to ingest weather batch
+9. Run Silver notebooks in `scripts/2_silver/` to clean and transform each table
+10. Run Gold notebooks in `scripts/3_gold/` to build dimension and fact tables
+11. Run `dashboarding/views` to create dashboard views
