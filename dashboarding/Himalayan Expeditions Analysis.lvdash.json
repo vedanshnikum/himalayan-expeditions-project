@@ -282,7 +282,6 @@
       "queryLines": [
         "SELECT\n",
         "    SUM(COUNT(*)) OVER () AS `All Deaths`,\n",
-        "    'Oxygen' AS `Situation`,\n",
         "    CASE \n",
         "        WHEN `Oxygen Used` = true THEN 'Oxygen Used' \n",
         "        ELSE 'No Oxygen' \n",
@@ -299,7 +298,6 @@
         "\n",
         "SELECT\n",
         "    SUM(COUNT(*)) OVER () AS `All Deaths`,\n",
-        "    'Hired' AS `Situation`,\n",
         "    CASE \n",
         "        WHEN `Hired` = true THEN 'Hired' \n",
         "        ELSE 'Non-Hired' \n",
@@ -311,7 +309,7 @@
         "  AND `Cause of Death` IS NOT NULL\n",
         "  AND `Cause of Death` != 'Unknown'\n",
         "GROUP BY `Situation Detail`, `Cause of Death`\n",
-        "ORDER BY `Situation` DESC, `Situation Detail`, `Cause of Death`"
+        "ORDER BY `Situation Detail`, `Cause of Death`"
       ]
     },
     {
@@ -2069,11 +2067,11 @@
                   "datasetName": "f6a3271a",
                   "fields": [
                     {
-                      "name": "max(Age)",
-                      "expression": "MAX(`Age`)"
+                      "name": "Age",
+                      "expression": "`Age`"
                     }
                   ],
-                  "disaggregated": false
+                  "disaggregated": true
                 }
               }
             ],
@@ -2086,7 +2084,7 @@
               "widgetType": "counter",
               "encodings": {
                 "value": {
-                  "fieldName": "max(Age)"
+                  "fieldName": "Age"
                 }
               }
             }
@@ -3516,9 +3514,6 @@
                 },
                 "y": {
                   "fieldName": "sum(Deaths)",
-                  "axis": {
-                    "title": "Expeditions"
-                  },
                   "displayName": "Deaths",
                   "scale": {
                     "type": "quantitative"
@@ -3808,7 +3803,7 @@
               },
               "frame": {
                 "showTitle": true,
-                "title": "Total Deaths with vs without oxygen"
+                "title": "Deaths by Oxygen Status"
               },
               "widgetType": "histogram",
               "encodings": {
@@ -3938,7 +3933,7 @@
               "version": 3,
               "frame": {
                 "showTitle": true,
-                "title": "Total Deaths with hired vs non hired"
+                "title": "Deaths by Sherpa Status"
               },
               "widgetType": "histogram",
               "encodings": {
@@ -4306,7 +4301,7 @@
               "version": 3,
               "frame": {
                 "showTitle": true,
-                "title": "Average temperature by year"
+                "title": "Average Temperature by Year"
               },
               "widgetType": "line",
               "encodings": {
