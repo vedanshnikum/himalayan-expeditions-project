@@ -1,0 +1,4618 @@
+{
+  "datasets": [
+    {
+      "name": "0008342d",
+      "displayName": "vw_expeditions",
+      "queryLines": [
+        "SELECT * FROM himalaya.gold.vw_expeditions"
+      ]
+    },
+    {
+      "name": "419b4f24",
+      "displayName": "vw_members",
+      "queryLines": [
+        "SELECT * FROM himalaya.gold.vw_members"
+      ],
+      "catalog": "himalaya",
+      "schema": "gold"
+    },
+    {
+      "name": "73de7c13",
+      "displayName": "Average Success Rate",
+      "queryLines": [
+        "SELECT ROUND(SUM(CASE WHEN `Success` = true THEN 1 ELSE 0 END) / NULLIF(COUNT(`Expedition ID`), 0), 3) AS `Average Success Rate (%)`\n",
+        "FROM himalaya.gold.vw_expeditions"
+      ]
+    },
+    {
+      "name": "a2456164",
+      "displayName": "Date Range",
+      "queryLines": [
+        "SELECT CONCAT(MIN(`Year`), ' — ', MAX(`Year`)) AS `Years of Data`\n",
+        "FROM himalaya.gold.vw_expeditions"
+      ]
+    },
+    {
+      "name": "20d5f732",
+      "displayName": "Success and Failure by year",
+      "queryLines": [
+        "SELECT \n",
+        "    `Year`,\n",
+        "    COUNT(DISTINCT CASE WHEN `Success` = true THEN `Expedition ID` END) AS `Successes`,\n",
+        "    COUNT(DISTINCT CASE WHEN `Success` = false THEN `Expedition ID` END) AS `Failures`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "GROUP BY `Year`\n",
+        "ORDER BY `Year`"
+      ]
+    },
+    {
+      "name": "6a7c060a",
+      "displayName": "First Successful Climbed Peak",
+      "queryLines": [
+        "SELECT \n",
+        "    `Mountain`,\n",
+        "    `First Ascent Year`,\n",
+        "    `First Ascent Season`,\n",
+        "    `First Ascent Country`,\n",
+        "    `First Ascent Members`,\n",
+        "    `Height (m)`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "WHERE `First Ascent Year` IS NOT NULL\n",
+        "ORDER BY `First Ascent Year` ASC\n",
+        "LIMIT 1"
+      ],
+      "catalog": "himalaya",
+      "schema": "gold"
+    },
+    {
+      "name": "ee2219c2",
+      "displayName": "Most Expeditions",
+      "queryLines": [
+        "SELECT `Mountain`, COUNT(DISTINCT `Expedition ID`) AS `Total Expeditions`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "GROUP BY `Mountain`\n",
+        "ORDER BY `Total Expeditions` DESC\n",
+        "LIMIT 1"
+      ]
+    },
+    {
+      "name": "0b70b8f3",
+      "displayName": "Highest Peak",
+      "queryLines": [
+        "SELECT `Mountain`, MAX(`Height (m)`) AS `Height (m)`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "GROUP BY `Mountain`\n",
+        "ORDER BY `Height (m)` DESC\n",
+        "LIMIT 1"
+      ]
+    },
+    {
+      "name": "4e95c6e2",
+      "displayName": "Hardest Peak",
+      "queryLines": [
+        "SELECT `Mountain`,\n",
+        "    SUM(CASE WHEN `Success` = true THEN 1 ELSE 0 END) AS `Successful Expeditions`,\n",
+        "    COUNT(`Expedition ID`) AS `Total Expeditions`,\n",
+        "    ROUND(SUM(CASE WHEN `Success` = true THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(`Expedition ID`), 0), 1) AS `Success Rate (%)`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "GROUP BY `Mountain`\n",
+        "HAVING SUM(CASE WHEN `Success` = true THEN 1 ELSE 0 END) >= 1\n",
+        "ORDER BY `Success Rate (%)` ASC\n",
+        "LIMIT 1"
+      ]
+    },
+    {
+      "name": "d2e00c57",
+      "displayName": "Deadliest Peak",
+      "queryLines": [
+        "SELECT\n",
+        "  `Mountain`,\n",
+        "  SUM(`Deaths`) AS total_deaths,\n",
+        "  COUNT(*) AS expedition_count,\n",
+        "  SUM(`Deaths`) / COUNT(*) AS deaths_per_expedition\n",
+        "FROM\n",
+        "  himalaya.gold.vw_expeditions\n",
+        "GROUP BY\n",
+        "  `Mountain`\n",
+        "ORDER BY\n",
+        "  deaths_per_expedition DESC\n",
+        "LIMIT 1"
+      ]
+    },
+    {
+      "name": "ae628b71",
+      "displayName": "Avg Success Rate by Mountain",
+      "queryLines": [
+        "SELECT \n",
+        "    `Mountain`,\n",
+        "    COUNT(CASE WHEN `Success` = true THEN 1 END)/COUNT(`Expedition ID`) AS `Success Rate`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "GROUP BY `Mountain`"
+      ]
+    },
+    {
+      "name": "ef058aa1",
+      "displayName": "Avg Death Rate By Mountain",
+      "queryLines": [
+        "SELECT \n",
+        "    `Mountain`,\n",
+        "    ROUND(SUM(`Deaths`) / SUM(`Total Members`), 3) AS `Death Rate`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "GROUP BY `Mountain`"
+      ]
+    },
+    {
+      "name": "0ff92a89",
+      "displayName": "Avg Oxygen Usage by Mountain",
+      "queryLines": [
+        "\n",
+        "SELECT \n",
+        "    `Mountain`,\n",
+        "    ROUND(SUM(CASE WHEN `Oxygen Used` = true THEN 1 ELSE 0 END) / COUNT(`Expedition ID`), 3) AS `Oxygen Usage Rate`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "GROUP BY `Mountain`"
+      ]
+    },
+    {
+      "name": "81e05ae2",
+      "displayName": "Nationality",
+      "queryLines": [
+        "SELECT DISTINCT `Nationality`, COUNT(DISTINCT `Name`) FROM himalaya.gold.vw_members GROUP BY `Nationality`"
+      ]
+    },
+    {
+      "name": "f6a3271a",
+      "displayName": "Youngest Climber",
+      "queryLines": [
+        "SELECT `Name`, `Nationality`, `Summit Date`, `Year of Birth`, \n",
+        "       YEAR(`Summit Date`) - `Year of Birth` AS `Age`\n",
+        "FROM himalaya.gold.vw_members\n",
+        "WHERE `Summit Date` IS NOT NULL \n",
+        "  AND `Year of Birth` IS NOT NULL\n",
+        "  AND YEAR(`Summit Date`) - `Year of Birth` IS NOT NULL\n",
+        "ORDER BY `Age` ASC\n",
+        "LIMIT 1"
+      ]
+    },
+    {
+      "name": "7cd3b4bf",
+      "displayName": "Oldest Climber",
+      "queryLines": [
+        "SELECT `Name`, `Nationality`, `Summit Date`, `Year of Birth`, \n",
+        "       YEAR(`Summit Date`) - `Year of Birth` AS `Age`\n",
+        "FROM himalaya.gold.vw_members\n",
+        "WHERE `Summit Date` IS NOT NULL \n",
+        "  AND `Year of Birth` IS NOT NULL\n",
+        "  AND YEAR(`Summit Date`) - `Year of Birth` IS NOT NULL\n",
+        "ORDER BY `Age` DESC\n",
+        "LIMIT 1"
+      ]
+    },
+    {
+      "name": "1a2dee3b",
+      "displayName": "Avg leader age",
+      "queryLines": [
+        "SELECT \n",
+        "    ROUND(AVG(CASE WHEN `Leader` = false THEN `Year of Birth` END)) AS `Avg YOB Non-Leader`,\n",
+        "    ROUND(AVG(CASE WHEN `Leader` = true  THEN `Year of Birth` END)) AS `Avg YOB Leader`,\n",
+        "    ROUND(AVG(CASE WHEN `Leader` = false THEN `Year of Birth` END)) -\n",
+        "    ROUND(AVG(CASE WHEN `Leader` = true  THEN `Year of Birth` END)) AS `Years Older (Leaders)`\n",
+        "FROM himalaya.gold.vw_members\n",
+        "WHERE `Year of Birth` IS NOT NULL\n",
+        "  AND `Leader` IS NOT NULL"
+      ]
+    },
+    {
+      "name": "7ac644fc",
+      "displayName": "Most Leaders",
+      "queryLines": [
+        "SELECT `Expedition ID`, SUM(CASE WHEN `Leader` = true THEN 1 ELSE 0 END) AS `Leader Count`, `Mountain`\n",
+        "FROM himalaya.gold.vw_members\n",
+        "GROUP BY `Expedition ID`, `Mountain`\n",
+        "ORDER BY `leader count` DESC"
+      ]
+    },
+    {
+      "name": "c1ad35cb",
+      "displayName": "Most Expeditions by Individual",
+      "queryLines": [
+        "SELECT `Name`, COUNT(DISTINCT `Expedition ID`) AS `Expedition Count`\n",
+        "FROM himalaya.gold.vw_members\n",
+        "WHERE `Name` IS NOT NULL\n",
+        "GROUP BY `Name`\n",
+        "ORDER BY `Expedition Count` DESC"
+      ]
+    },
+    {
+      "name": "edd49ace",
+      "displayName": "Success Rate by Season",
+      "queryLines": [
+        "SELECT\n",
+        "  `Season`,\n",
+        "  COUNT(*) AS `Total Expeditions`,\n",
+        "  SUM(CASE WHEN `Success` = true THEN 1 ELSE 0 END) AS `Successful Expeditions`,\n",
+        "  ROUND(SUM(CASE WHEN `Success` = true THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) AS `Success Rate %`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "GROUP BY `Season`\n",
+        "ORDER BY `Success Rate %` DESC"
+      ],
+      "catalog": "himalaya",
+      "schema": "gold"
+    },
+    {
+      "name": "8f01966f",
+      "displayName": "Hired vs non-Hired success rate",
+      "queryLines": [
+        "SELECT\n",
+        "  CASE WHEN `Summit Hired` > 0 THEN 'Hired'\n",
+        "       ELSE 'Non-Hired' END AS `Hired Status`,\n",
+        "  ROUND(AVG(CASE WHEN `Success` = true THEN 1.0 ELSE 0.0 END), 3) AS `Avg Success Rate %`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "GROUP BY `Hired Status`"
+      ]
+    },
+    {
+      "name": "9d303895",
+      "displayName": "Success Rate by Oxygen",
+      "queryLines": [
+        "SELECT\n",
+        "  CASE WHEN `Oxygen Used` = true THEN 'Oxygen Used'\n",
+        "       ELSE 'No Oxygen' END AS `Oxygen Status`,\n",
+        "  ROUND(AVG(CASE WHEN `Success` = true THEN 1.0 ELSE 0.0 END), 2) AS `Avg Success Rate %`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "GROUP BY `Oxygen Status`"
+      ]
+    },
+    {
+      "name": "45536e6e",
+      "displayName": "Death with vs without Sherpas",
+      "queryLines": [
+        "SELECT\n",
+        "  CASE WHEN `Sherpa` = true THEN 'Sherpa'\n",
+        "       ELSE 'Non-Sherpa' END AS `Sherpa Status`,\n",
+        "  COUNT(*) AS `Total Members`,\n",
+        "  SUM(CASE WHEN `Death` = true THEN 1 ELSE 0 END) AS `Total Deaths`\n",
+        "FROM himalaya.gold.vw_members\n",
+        "GROUP BY `Sherpa Status`"
+      ]
+    },
+    {
+      "name": "e23ab8a2",
+      "displayName": "Deaths for Sankey",
+      "queryLines": [
+        "SELECT\n",
+        "    SUM(COUNT(*)) OVER () AS `All Deaths`,\n",
+        "    CASE \n",
+        "        WHEN `Oxygen Used` = true THEN 'Oxygen Used' \n",
+        "        ELSE 'No Oxygen' \n",
+        "    END AS `Situation Detail`,\n",
+        "    `Cause of Death`,\n",
+        "    COUNT(*) AS `Deaths`\n",
+        "FROM himalaya.gold.vw_members\n",
+        "WHERE `Death` = true\n",
+        "  AND `Cause of Death` IS NOT NULL\n",
+        "  AND `Cause of Death` != 'Unknown'\n",
+        "GROUP BY `Situation Detail`, `Cause of Death`\n",
+        "\n",
+        "UNION ALL\n",
+        "\n",
+        "SELECT\n",
+        "    SUM(COUNT(*)) OVER () AS `All Deaths`,\n",
+        "    CASE \n",
+        "        WHEN `Hired` = true THEN 'Hired' \n",
+        "        ELSE 'Non-Hired' \n",
+        "    END AS `Situation Detail`,\n",
+        "    `Cause of Death`,\n",
+        "    COUNT(*) AS `Deaths`\n",
+        "FROM himalaya.gold.vw_members\n",
+        "WHERE `Death` = true\n",
+        "  AND `Cause of Death` IS NOT NULL\n",
+        "  AND `Cause of Death` != 'Unknown'\n",
+        "GROUP BY `Situation Detail`, `Cause of Death`\n",
+        "ORDER BY `Situation Detail`, `Cause of Death`"
+      ]
+    },
+    {
+      "name": "9117656d",
+      "displayName": "Most Common Weather Condition",
+      "queryLines": [
+        "SELECT MODE(`Weather Condition`) AS `Most Common Weather Condition`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "WHERE `Weather Condition` IS NOT NULL"
+      ]
+    },
+    {
+      "name": "d78baaf2",
+      "displayName": "Success Rate by Weather Condition",
+      "queryLines": [
+        "SELECT `Weather Condition`,\n",
+        "    ROUND(AVG(CASE WHEN `Success` = true THEN 1.0 ELSE 0.0 END), 2) AS `Success Rate %`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "WHERE `Weather Condition` IS NOT NULL\n",
+        "GROUP BY `Weather Condition`\n",
+        "ORDER BY `Success Rate %` DESC"
+      ]
+    },
+    {
+      "name": "9daeb24f",
+      "displayName": "Death Rate by Weather Condition",
+      "queryLines": [
+        "SELECT `Weather Condition`,\n",
+        "    SUM(`Deaths`) AS `Total Deaths`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "WHERE `Weather Condition` IS NOT NULL\n",
+        "GROUP BY `Weather Condition`\n",
+        "ORDER BY `Total Deaths` DESC"
+      ]
+    },
+    {
+      "name": "b1cfba84",
+      "displayName": "Snowfall vs success rate",
+      "queryLines": [
+        "SELECT \n",
+        "    `Snowfall (cm)`,\n",
+        "    ROUND(AVG(CASE WHEN `Success` = true THEN 1.0 ELSE 0.0 END) * 100, 2) AS `Success Rate %`\n",
+        "FROM himalaya.gold.vw_expeditions\n",
+        "WHERE `Snowfall (cm)` IS NOT NULL\n",
+        "  AND `Weather Condition` IS NOT NULL\n",
+        "GROUP BY `Snowfall (cm)`\n",
+        "ORDER BY `Snowfall (cm)`"
+      ]
+    },
+    {
+      "name": "071c43d7",
+      "displayName": "True Average",
+      "queryLines": [
+        "SELECT \n",
+        "    ROUND(SUM(`Deaths`) / NULLIF(SUM(`Total Members`), 0), 2) AS `Death Rate %`\n",
+        "FROM himalaya.gold.vw_expeditions"
+      ],
+      "catalog": "himalaya",
+      "schema": "gold"
+    }
+  ],
+  "pages": [
+    {
+      "name": "b49419bb",
+      "displayName": "Global Filters",
+      "pageType": "PAGE_TYPE_GLOBAL_FILTERS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "713a788e",
+      "displayName": "Overview",
+      "layout": [
+        {
+          "widget": {
+            "name": "total-expeditions",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "countdistinct(Expedition ID)",
+                      "expression": "COUNT(DISTINCT `Expedition ID`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Total Expeditions"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "countdistinct(Expedition ID)",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "all"
+                    },
+                    "significantFigures": {
+                      "type": "all"
+                    },
+                    "hideGroupSeparator": false
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "91b1d023",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "sum(Deaths)",
+                      "expression": "SUM(`Deaths`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Total Deaths"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(Deaths)",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 1,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "14ce63da",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "countdistinct(Mountain)",
+                      "expression": "COUNT(DISTINCT `Mountain`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Total Mountains"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "countdistinct(Mountain)"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 1,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "81493a78",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "73de7c13",
+                  "fields": [
+                    {
+                      "name": "Average Success Rate (%)",
+                      "expression": "`Average Success Rate (%)`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Average Success Rate"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Average Success Rate (%)",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 1,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "f9efdc2e",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "419b4f24",
+                  "fields": [
+                    {
+                      "name": "countdistinct(Name)",
+                      "expression": "COUNT(DISTINCT `Name`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Total Members"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "countdistinct(Name)",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 1,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "34268ee5",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "a2456164",
+                  "fields": [
+                    {
+                      "name": "Years of Data",
+                      "expression": "`Years of Data`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Year Range in Records"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Years of Data",
+                  "style": {
+                    "fontSize": 24
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 10,
+            "y": 1,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "expeditions-per-year",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "Year",
+                      "expression": "`Year`"
+                    },
+                    {
+                      "name": "countdistinct(Expedition ID)",
+                      "expression": "COUNT(DISTINCT `Expedition ID`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Expeditions by Year"
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "Year",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "countdistinct(Expedition ID)",
+                  "axis": {
+                    "title": "Expeditions"
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "success-vs-failure-by-year",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "20d5f732",
+                  "fields": [
+                    {
+                      "name": "Year",
+                      "expression": "`Year`"
+                    },
+                    {
+                      "name": "sum(Successes)",
+                      "expression": "SUM(`Successes`)"
+                    },
+                    {
+                      "name": "sum(Failures)",
+                      "expression": "SUM(`Failures`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Success vs Failure by Year"
+              },
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ],
+                "layout": "stack"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Year",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "primary": {
+                    "fields": [
+                      {
+                        "fieldName": "sum(Successes)",
+                        "displayName": "Successes"
+                      }
+                    ],
+                    "scale": {
+                      "type": "quantitative"
+                    }
+                  },
+                  "secondary": {
+                    "fields": [
+                      {
+                        "fieldName": "sum(Failures)",
+                        "displayName": "Failures"
+                      }
+                    ],
+                    "scale": {
+                      "type": "quantitative",
+                      "reverse": false
+                    },
+                    "format": {
+                      "type": "number-plain",
+                      "abbreviation": "compact",
+                      "decimalPlaces": {
+                        "type": "max",
+                        "places": 2
+                      }
+                    },
+                    "axis": {
+                      "hideLabels": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 3,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "160b0885",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "countdistinct(Expedition ID)",
+                      "expression": "COUNT(DISTINCT `Expedition ID`)"
+                    },
+                    {
+                      "name": "Mountain",
+                      "expression": "`Mountain`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Most Climbed Peaks"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "countdistinct(Expedition ID)",
+                  "axis": {
+                    "title": "Expeditions"
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "Mountain",
+                  "scale": {
+                    "type": "categorical",
+                    "categorySize": {
+                      "type": "number-of-categories",
+                      "number": 10
+                    },
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "8e772b41",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "countdistinct(Expedition ID)",
+                      "expression": "COUNT(DISTINCT `Expedition ID`)"
+                    },
+                    {
+                      "name": "Season",
+                      "expression": "`Season`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Expeditions by Season"
+              },
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "countdistinct(Expedition ID)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Expeditions"
+                },
+                "color": {
+                  "fieldName": "Season",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "angle-reversed"
+                    },
+                    "mappings": [
+                      {
+                        "value": "Winter",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 1
+                        }
+                      },
+                      {
+                        "value": "Summer",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 2
+                        }
+                      },
+                      {
+                        "value": "Unknown",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 9
+                        }
+                      },
+                      {
+                        "value": "Autumn",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 6
+                        }
+                      },
+                      {
+                        "value": "Spring",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 3
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 9,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "83fed938",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "Year",
+                      "expression": "`Year`"
+                    },
+                    {
+                      "name": "countdistinct(Expedition ID)",
+                      "expression": "COUNT(DISTINCT `Expedition ID`)"
+                    },
+                    {
+                      "name": "sum(Deaths)",
+                      "expression": "SUM(`Deaths`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Expeditions vs Deaths"
+              },
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 1
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "Year",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "primary": {
+                    "fields": [
+                      {
+                        "fieldName": "countdistinct(Expedition ID)",
+                        "displayName": "Expeditions"
+                      }
+                    ],
+                    "scale": {
+                      "type": "quantitative"
+                    },
+                    "axis": {
+                      "title": "Expeditions"
+                    }
+                  },
+                  "secondary": {
+                    "fields": [
+                      {
+                        "fieldName": "sum(Deaths)",
+                        "displayName": "Deaths"
+                      }
+                    ],
+                    "scale": {
+                      "type": "quantitative"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 15,
+            "width": 12,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "first-climbed-mountain",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "6a7c060a",
+                  "fields": [
+                    {
+                      "name": "Mountain",
+                      "expression": "`Mountain`"
+                    },
+                    {
+                      "name": "Height (m)",
+                      "expression": "`Height (m)`"
+                    },
+                    {
+                      "name": "First Ascent Year",
+                      "expression": "`First Ascent Year`"
+                    },
+                    {
+                      "name": "First Ascent Season",
+                      "expression": "`First Ascent Season`"
+                    },
+                    {
+                      "name": "First Ascent Country",
+                      "expression": "`First Ascent Country`"
+                    },
+                    {
+                      "name": "First Ascent Members",
+                      "expression": "`First Ascent Members`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "First Successful Climbed Mountain in Records"
+              },
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "Mountain"
+                  },
+                  {
+                    "fieldName": "Height (m)",
+                    "contentAlignment": "right"
+                  },
+                  {
+                    "fieldName": "First Ascent Year"
+                  },
+                  {
+                    "fieldName": "First Ascent Season"
+                  },
+                  {
+                    "fieldName": "First Ascent Country"
+                  },
+                  {
+                    "fieldName": "First Ascent Members"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 22,
+            "width": 10,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "most-climbed-mountain",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ee2219c2",
+                  "fields": [
+                    {
+                      "name": "Mountain",
+                      "expression": "`Mountain`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Most Climbed Mountain"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Mountain"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 10,
+            "y": 22,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "4dda8c92",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## <span style=\"text-align:center;display:block\"><span style=\"text-decoration: underline;font-size: 24px;\">Fun Facts</span></span>"
+              ]
+            },
+            "specExtensions": {
+              "widgetBackgroundColor": {
+                "dark": "#131A35"
+              },
+              "widgetBorderColor": {
+                "dark": "#FFFFFF"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 21,
+            "width": 12,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "a74fc165",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## <span style=\"text-align:center;display:block\"><span style=\"text-decoration: underline;font-size: 24px;\">**O</span><span style=\"text-decoration: underline;\">verview**</span></span>"
+              ]
+            },
+            "specExtensions": {
+              "widgetBackgroundColor": {
+                "dark": "#131A35"
+              },
+              "widgetBorderColor": {
+                "dark": "#FFFFFF"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 1
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "b82cc433",
+      "displayName": "Mountain Info",
+      "layout": [
+        {
+          "widget": {
+            "name": "7f673472",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0b70b8f3",
+                  "fields": [
+                    {
+                      "name": "Mountain",
+                      "expression": "`Mountain`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Highest Mountain"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Mountain"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "8d35077b",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "4e95c6e2",
+                  "fields": [
+                    {
+                      "name": "Mountain",
+                      "expression": "`Mountain`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Hardest Mountain Summited"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Mountain"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 1,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "1990134f",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d2e00c57",
+                  "fields": [
+                    {
+                      "name": "Mountain",
+                      "expression": "`Mountain`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Deadliest Mountain"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Mountain"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 1,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "average-height-vs-success-rate",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ae628b71",
+                  "fields": [
+                    {
+                      "name": "Mountain",
+                      "expression": "`Mountain`"
+                    },
+                    {
+                      "name": "avg(Success Rate)",
+                      "expression": "AVG(`Success Rate`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Average Success Rate by Mountain"
+              },
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Mountain",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "avg(Success Rate)",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    },
+                    "significantFigures": {
+                      "type": "all"
+                    },
+                    "hideGroupSeparator": false
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 4,
+            "width": 12,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "0fb5940f",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ef058aa1",
+                  "fields": [
+                    {
+                      "name": "Death Rate",
+                      "expression": "`Death Rate`"
+                    },
+                    {
+                      "name": "Mountain",
+                      "expression": "`Mountain`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Average Death Rate by Mountain"
+              },
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Death Rate",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    },
+                    "significantFigures": {
+                      "type": "exact",
+                      "figures": 2
+                    }
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "Mountain",
+                  "scale": {
+                    "type": "categorical",
+                    "categorySize": {
+                      "type": "number-of-categories",
+                      "number": 10
+                    },
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 16,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "34516e22",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## <span style=\"text-align:center;display:block\"><span style=\"text-decoration:underline;font-size:24px\">Mountain Information</span></span>"
+              ]
+            },
+            "specExtensions": {
+              "widgetBackgroundColor": {
+                "dark": "#131A35"
+              },
+              "widgetBorderColor": {
+                "dark": "#FFFFFF"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "average-oxygen-by-height",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0ff92a89",
+                  "fields": [
+                    {
+                      "name": "Mountain",
+                      "expression": "`Mountain`"
+                    },
+                    {
+                      "name": "Oxygen Usage Rate",
+                      "expression": "`Oxygen Usage Rate`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Average Oxygen Usage by Mountain"
+              },
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "selectionColor"
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Mountain",
+                  "scale": {
+                    "type": "categorical",
+                    "categorySize": {
+                      "type": "number-of-categories",
+                      "number": 20
+                    },
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "Oxygen Usage Rate",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 10,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "mountains-in-each-himalayan-region",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "countdistinct(Mountain)",
+                      "expression": "COUNT(DISTINCT `Mountain`)"
+                    },
+                    {
+                      "name": "Region",
+                      "expression": "`Region`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Mountains in Each Himalayan Region"
+              },
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "countdistinct(Mountain)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "axis": {
+                    "title": "Mountains"
+                  }
+                },
+                "color": {
+                  "fieldName": "Region",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "label": {
+                  "show": false
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 16,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "bfb567b6",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "countdistinct(Expedition ID)",
+                      "expression": "COUNT(DISTINCT `Expedition ID`)"
+                    },
+                    {
+                      "name": "Mountain",
+                      "expression": "`Mountain`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Expeditions per Mountain"
+              },
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "countdistinct(Expedition ID)",
+                  "axis": {
+                    "title": "Expeditions"
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "Mountain",
+                  "scale": {
+                    "type": "categorical",
+                    "categorySize": {
+                      "type": "number-of-categories",
+                      "number": 10
+                    },
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 10,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "10ad8155",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ee2219c2",
+                  "fields": [
+                    {
+                      "name": "Mountain",
+                      "expression": "`Mountain`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Most Climbed Mountain"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Mountain"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 1,
+            "width": 3,
+            "height": 3
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "d02dcf25",
+      "displayName": "Member Info",
+      "layout": [
+        {
+          "widget": {
+            "name": "nationality-of-members",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "81e05ae2",
+                  "fields": [
+                    {
+                      "name": "sum(count(DISTINCT Name))",
+                      "expression": "SUM(`count(DISTINCT Name)`)"
+                    },
+                    {
+                      "name": "Nationality",
+                      "expression": "`Nationality`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "frame": {
+                "showTitle": true,
+                "title": "Nationality of Members",
+                "showDescription": false
+              },
+              "widgetType": "choropleth-map",
+              "encodings": {
+                "color": {
+                  "fieldName": "sum(count(DISTINCT Name))",
+                  "displayName": "Count",
+                  "scale": {
+                    "type": "quantitative",
+                    "colorRamp": {
+                      "mode": "scheme",
+                      "scheme": "reds"
+                    }
+                  }
+                },
+                "region": {
+                  "regionType": "mapbox-v4-admin",
+                  "admin0": {
+                    "fieldName": "Nationality",
+                    "type": "field",
+                    "geographicRole": "admin0-name"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 5,
+            "y": 1,
+            "width": 7,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "c63f1a55",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## <span style=\"text-align:center;display:block\"><span style=\"text-decoration:underline;font-size:24px\">Member Information</span></span>"
+              ]
+            },
+            "specExtensions": {
+              "widgetBackgroundColor": {
+                "dark": "#131A35"
+              },
+              "widgetBorderColor": {
+                "dark": "#FFFFFF"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "d97c5e83",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "f6a3271a",
+                  "fields": [
+                    {
+                      "name": "Age",
+                      "expression": "`Age`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Youngest Climber Age"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Age"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "ecab0e52",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "f6a3271a",
+                  "fields": [
+                    {
+                      "name": "Name",
+                      "expression": "`Name`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Youngest Climber Name"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Name"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 5,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "64dae4df",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "f6a3271a",
+                  "fields": [
+                    {
+                      "name": "Nationality",
+                      "expression": "`Nationality`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Youngest Climber Nationality"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Nationality"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 1,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "cd190e51",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "419b4f24",
+                  "fields": [
+                    {
+                      "name": "count(Sex)",
+                      "expression": "COUNT(`Sex`)"
+                    },
+                    {
+                      "name": "Sex",
+                      "expression": "`Sex`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "count(Sex)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "axis": {
+                    "title": "Sex"
+                  }
+                },
+                "color": {
+                  "fieldName": "Sex",
+                  "legend": {
+                    "title": ""
+                  },
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "X",
+                        "color": {
+                          "themeColorType": "fontColor"
+                        }
+                      },
+                      {
+                        "value": "M",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 1
+                        }
+                      },
+                      {
+                        "value": "F",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 8
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 5,
+            "width": 5,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "38088839",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "7cd3b4bf",
+                  "fields": [
+                    {
+                      "name": "max(Age)",
+                      "expression": "MAX(`Age`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Oldest Climber Age"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "max(Age)"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 5,
+            "y": 11,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "978d3ead",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "7cd3b4bf",
+                  "fields": [
+                    {
+                      "name": "Name",
+                      "expression": "`Name`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Oldest Climber Name"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Name"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 5,
+            "y": 9,
+            "width": 7,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "0bc9fcf8",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "7cd3b4bf",
+                  "fields": [
+                    {
+                      "name": "Nationality",
+                      "expression": "`Nationality`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Oldest Climber Nationality"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Nationality"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 11,
+            "width": 4,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "493dcd3c",
+      "displayName": "Expedition Analysis",
+      "layout": [
+        {
+          "widget": {
+            "name": "40c0719a",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "countdistinct(Expedition ID)",
+                      "expression": "COUNT(DISTINCT `Expedition ID`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Total Expeditions"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "countdistinct(Expedition ID)",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "all"
+                    },
+                    "significantFigures": {
+                      "type": "all"
+                    },
+                    "hideGroupSeparator": false
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "0a884ad2",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## <span style=\"text-align:center;display:block\"><span style=\"text-decoration:underline;font-size:24px\">Expedition Information</span></span>"
+              ]
+            },
+            "specExtensions": {
+              "widgetBackgroundColor": {
+                "dark": "#131A35"
+              },
+              "widgetBorderColor": {
+                "dark": "#FFFFFF"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "1ba45da1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "max(Total Members)",
+                      "expression": "MAX(`Total Members`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Largest Expedition"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "max(Total Members)",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "all"
+                    },
+                    "significantFigures": {
+                      "type": "all"
+                    },
+                    "hideGroupSeparator": false
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 1,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "f0f4b046",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "Year",
+                      "expression": "`Year`"
+                    },
+                    {
+                      "name": "countdistinct(Expedition ID)",
+                      "expression": "COUNT(DISTINCT `Expedition ID`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Expeditions by Year"
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "Year",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "countdistinct(Expedition ID)",
+                  "axis": {
+                    "title": "Expeditions"
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "83b9df55",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "edd49ace",
+                  "fields": [
+                    {
+                      "name": "sum(Total Expeditions)",
+                      "expression": "SUM(`Total Expeditions`)"
+                    },
+                    {
+                      "name": "Season",
+                      "expression": "`Season`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Expeditions by Season"
+              },
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "sum(Total Expeditions)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Expeditions"
+                },
+                "color": {
+                  "fieldName": "Season",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "Autumn",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 6
+                        }
+                      },
+                      {
+                        "value": "Winter",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 1
+                        }
+                      },
+                      {
+                        "value": "Summer",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 2
+                        }
+                      },
+                      {
+                        "value": "Spring",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 3
+                        }
+                      }
+                    ],
+                    "sort": {
+                      "by": "custom-order",
+                      "orderedValues": [
+                        "Autumn",
+                        "Winter",
+                        "Spring",
+                        "Summer",
+                        "Unknown"
+                      ]
+                    }
+                  }
+                },
+                "label": {
+                  "show": false
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 11,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "b4c26091",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "1a2dee3b",
+                  "fields": [
+                    {
+                      "name": "max(Years Older (Leaders))",
+                      "expression": "MAX(`Years Older (Leaders)`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "How much older is a typical leader?"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "max(Years Older (Leaders))",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "all"
+                    },
+                    "significantFigures": {
+                      "type": "all"
+                    },
+                    "hideGroupSeparator": false
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 10,
+            "y": 7,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "b0b7dc0c",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "c1ad35cb",
+                  "fields": [
+                    {
+                      "name": "Expedition Count",
+                      "expression": "`Expedition Count`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Most Expeditions by a person"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Expedition Count"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 9,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "aceac950",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "c1ad35cb",
+                  "fields": [
+                    {
+                      "name": "Name",
+                      "expression": "`Name`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Most Expeditions Person"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Name"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "3291e864",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "7ac644fc",
+                  "fields": [
+                    {
+                      "name": "Leader Count",
+                      "expression": "`Leader Count`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Most Leaders in an Exped"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Leader Count"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 7,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "c77f74e0",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "7ac644fc",
+                  "fields": [
+                    {
+                      "name": "Mountain",
+                      "expression": "`Mountain`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Most Leaders - Mountain"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Mountain"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 7,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "success-rate-by-season",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "edd49ace",
+                  "fields": [
+                    {
+                      "name": "Success Rate %",
+                      "expression": "`Success Rate %`"
+                    },
+                    {
+                      "name": "Season",
+                      "expression": "`Season`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Success Rate by Season"
+              },
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "Success Rate %",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Season",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "Autumn",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 6
+                        }
+                      },
+                      {
+                        "value": "Summer",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 2
+                        }
+                      },
+                      {
+                        "value": "Spring",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 3
+                        }
+                      },
+                      {
+                        "value": "Unknown",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 9
+                        }
+                      },
+                      {
+                        "value": "Winter",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 1
+                        }
+                      }
+                    ],
+                    "sort": {
+                      "by": "custom-order",
+                      "orderedValues": [
+                        "Autumn",
+                        "Winter",
+                        "Spring",
+                        "Summer",
+                        "Unknown"
+                      ]
+                    }
+                  }
+                },
+                "label": {
+                  "show": false
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 11,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "common-termination-reasons",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    },
+                    {
+                      "name": "Termination Reason",
+                      "expression": "`Termination Reason`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Common Termination Reasons"
+              },
+              "widgetType": "heatmap",
+              "encodings": {
+                "y": {
+                  "fieldName": "Termination Reason",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "natural-order"
+                    }
+                  }
+                },
+                "color": {
+                  "fieldName": "count(*)",
+                  "scale": {
+                    "type": "quantitative",
+                    "colorRamp": {
+                      "mode": "scheme",
+                      "scheme": "reds"
+                    }
+                  }
+                },
+                "label": {
+                  "show": false
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 1,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "season",
+            "queries": [
+              {
+                "name": "dashboards/01f122e164fc1ab38d9e3fbcc04250da/datasets/01f12493708c1f6d9a384c33bb10811f_Season",
+                "query": {
+                  "datasetName": "edd49ace",
+                  "fields": [
+                    {
+                      "name": "Season",
+                      "expression": "`Season`"
+                    },
+                    {
+                      "name": "Season_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "disallowAll": false,
+              "frame": {
+                "showTitle": true,
+                "title": "Season - Filter"
+              },
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "Season",
+                    "queryName": "dashboards/01f122e164fc1ab38d9e3fbcc04250da/datasets/01f12493708c1f6d9a384c33bb10811f_Season"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 9,
+            "width": 6,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "26b8fcdf",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "20d5f732",
+                  "fields": [
+                    {
+                      "name": "Year",
+                      "expression": "`Year`"
+                    },
+                    {
+                      "name": "sum(Successes)",
+                      "expression": "SUM(`Successes`)"
+                    },
+                    {
+                      "name": "sum(Failures)",
+                      "expression": "SUM(`Failures`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Success vs Failure by Year"
+              },
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ],
+                "layout": "stack"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Year",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "primary": {
+                    "fields": [
+                      {
+                        "fieldName": "sum(Successes)",
+                        "displayName": "Successes"
+                      }
+                    ],
+                    "scale": {
+                      "type": "quantitative"
+                    }
+                  },
+                  "secondary": {
+                    "fields": [
+                      {
+                        "fieldName": "sum(Failures)",
+                        "displayName": "Failures"
+                      }
+                    ],
+                    "scale": {
+                      "type": "quantitative",
+                      "reverse": false
+                    },
+                    "format": {
+                      "type": "number-plain",
+                      "abbreviation": "compact",
+                      "decimalPlaces": {
+                        "type": "max",
+                        "places": 2
+                      }
+                    },
+                    "axis": {
+                      "hideLabels": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 17,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "success-rate-sherpas",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "8f01966f",
+                  "fields": [
+                    {
+                      "name": "Hired Status",
+                      "expression": "`Hired Status`"
+                    },
+                    {
+                      "name": "Avg Success Rate %",
+                      "expression": "`Avg Success Rate %`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "mark": {
+                "layout": "stack"
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Success Rate by Hired Status"
+              },
+              "widgetType": "histogram",
+              "encodings": {
+                "x": {
+                  "fieldName": "Hired Status",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "Avg Success Rate %",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "all"
+                    },
+                    "significantFigures": {
+                      "type": "all"
+                    }
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Hired Status",
+                  "legend": {
+                    "hide": true
+                  },
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "label": {
+                  "show": false
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 17,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "success-rate-oxygen",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "9d303895",
+                  "fields": [
+                    {
+                      "name": "Oxygen Status",
+                      "expression": "`Oxygen Status`"
+                    },
+                    {
+                      "name": "Avg Success Rate %",
+                      "expression": "`Avg Success Rate %`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "mark": {
+                "layout": "stack"
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Success Rate by Oxygen"
+              },
+              "widgetType": "histogram",
+              "encodings": {
+                "x": {
+                  "fieldName": "Oxygen Status",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "natural-order-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "Avg Success Rate %",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "all"
+                    },
+                    "significantFigures": {
+                      "type": "all"
+                    }
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Oxygen Status",
+                  "legend": {
+                    "hideTitle": false,
+                    "hide": true
+                  },
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 17,
+            "width": 3,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "66b520c6",
+      "displayName": "Death Analysis",
+      "layout": [
+        {
+          "widget": {
+            "name": "d9287a6e",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "sum(Deaths)",
+                      "expression": "SUM(`Deaths`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Total Deaths"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(Deaths)",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "79b79d53",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## <span style=\"text-align:center;display:block\"><span style=\"text-decoration: underline;font-size: 24px;\">Deaths</span><span style=\"text-decoration: underline;\"> Analysis</span></span>"
+              ]
+            },
+            "specExtensions": {
+              "widgetBackgroundColor": {
+                "dark": "#131A35"
+              },
+              "widgetBorderColor": {
+                "dark": "#FFFFFF"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "9ae94f29",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "Year",
+                      "expression": "`Year`"
+                    },
+                    {
+                      "name": "sum(Deaths)",
+                      "expression": "SUM(`Deaths`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Total Deaths Per Year"
+              },
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "Year",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(Deaths)",
+                  "displayName": "Deaths",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 17,
+            "width": 12,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "a6d34af5",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d2e00c57",
+                  "fields": [
+                    {
+                      "name": "Mountain",
+                      "expression": "`Mountain`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Deadliest Mountain"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Mountain"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 1,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "d30da684",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ef058aa1",
+                  "fields": [
+                    {
+                      "name": "Death Rate",
+                      "expression": "`Death Rate`"
+                    },
+                    {
+                      "name": "Mountain",
+                      "expression": "`Mountain`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Average Death Rate by Mountain"
+              },
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Death Rate",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    },
+                    "significantFigures": {
+                      "type": "exact",
+                      "figures": 2
+                    }
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "Mountain",
+                  "scale": {
+                    "type": "categorical",
+                    "categorySize": {
+                      "type": "number-of-categories",
+                      "number": 10
+                    },
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 1,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "677a3026",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "max(Deaths)",
+                      "expression": "MAX(`Deaths`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Most Deaths in an Expedition"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "max(Deaths)"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 7,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "c46a80b0",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "071c43d7",
+                  "fields": [
+                    {
+                      "name": "avg(Death Rate %)",
+                      "expression": "AVG(`Death Rate %`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Avg Deaths Per Expedition"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(Death Rate %)",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    },
+                    "significantFigures": {
+                      "type": "max",
+                      "figures": 3
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 7,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "chance-of-death-with-vs-without-oxygen",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "Oxygen Used",
+                      "expression": "`Oxygen Used`"
+                    },
+                    {
+                      "name": "sum(Deaths)",
+                      "expression": "SUM(`Deaths`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "mark": {
+                "layout": "stack"
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Deaths by Oxygen Status"
+              },
+              "widgetType": "histogram",
+              "encodings": {
+                "x": {
+                  "fieldName": "Oxygen Used",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "natural-order-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(Deaths)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Oxygen Used",
+                  "legend": {
+                    "hide": true
+                  },
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 4,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "death-sources",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "e23ab8a2",
+                  "fields": [
+                    {
+                      "name": "All Deaths",
+                      "expression": "`All Deaths`"
+                    },
+                    {
+                      "name": "Situation Detail",
+                      "expression": "`Situation Detail`"
+                    },
+                    {
+                      "name": "Cause of Death",
+                      "expression": "`Cause of Death`"
+                    },
+                    {
+                      "name": "sum(Deaths)",
+                      "expression": "SUM(`Deaths`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "frame": {
+                "showTitle": true,
+                "title": "Known Death Sources"
+              },
+              "widgetType": "sankey",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(Deaths)"
+                },
+                "stages": [
+                  {
+                    "fieldName": "All Deaths",
+                    "displayName": "Total Deaths"
+                  },
+                  {
+                    "fieldName": "Situation Detail"
+                  },
+                  {
+                    "fieldName": "Cause of Death"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 10,
+            "width": 12,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "91bfc139",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "45536e6e",
+                  "fields": [
+                    {
+                      "name": "Sherpa Status",
+                      "expression": "`Sherpa Status`"
+                    },
+                    {
+                      "name": "avg(Total Deaths)",
+                      "expression": "AVG(`Total Deaths`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Deaths by Sherpa Status"
+              },
+              "widgetType": "histogram",
+              "encodings": {
+                "x": {
+                  "fieldName": "Sherpa Status",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "avg(Total Deaths)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Sherpa Status",
+                  "legend": {
+                    "hide": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 4,
+            "width": 3,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "9b9d8a76",
+      "displayName": "Weather Analysis",
+      "layout": [
+        {
+          "widget": {
+            "name": "85ba2b7c",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "9117656d",
+                  "fields": [
+                    {
+                      "name": "Most Common Weather Condition",
+                      "expression": "`Most Common Weather Condition`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Most Common Weather Condition"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Most Common Weather Condition"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "7ea3e4bb",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "avg(Temperature (°C))",
+                      "expression": "AVG(`Temperature (°C)`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Average Temperature (°C)"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(Temperature (°C))",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 0,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "440331da",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "avg(Wind Speed (km/h))",
+                      "expression": "AVG(`Wind Speed (km/h)`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Avg Wind Speed (km/h)"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(Wind Speed (km/h))",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 0,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "success-rate-by-weather-condition",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d78baaf2",
+                  "fields": [
+                    {
+                      "name": "Weather Condition",
+                      "expression": "`Weather Condition`"
+                    },
+                    {
+                      "name": "Success Rate %",
+                      "expression": "`Success Rate %`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Success Rate by Weather Condition"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Weather Condition",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "Success Rate %",
+                  "axis": {
+                    "title": "Success Rate"
+                  },
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Weather Condition",
+                  "legend": {
+                    "hide": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "deaths-by-weather-condition",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "9daeb24f",
+                  "fields": [
+                    {
+                      "name": "Weather Condition",
+                      "expression": "`Weather Condition`"
+                    },
+                    {
+                      "name": "Total Deaths",
+                      "expression": "`Total Deaths`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Deaths by Weather Condition"
+              },
+              "mark": {
+                "layout": "stack"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Weather Condition",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "Total Deaths",
+                  "axis": {
+                    "title": "Death Count"
+                  },
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 3
+                    },
+                    "significantFigures": {
+                      "type": "max",
+                      "figures": 3
+                    }
+                  },
+                  "displayName": "Death Count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Weather Condition",
+                  "legend": {
+                    "hide": true
+                  },
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 3,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "table-death-rate-weather-condition",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "Year",
+                      "expression": "`Year`"
+                    },
+                    {
+                      "name": "avg(Temperature (°C))",
+                      "expression": "AVG(`Temperature (°C)`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Average Temperature by Year"
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "Year",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "avg(Temperature (°C))",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "average-wind-speed-by-year",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "Year",
+                      "expression": "`Year`"
+                    },
+                    {
+                      "name": "avg(Wind Speed (km/h))",
+                      "expression": "AVG(`Wind Speed (km/h)`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Average Wind Speed by Year"
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "Year",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "avg(Wind Speed (km/h))",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 9,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "wind-speed-highest-point-reached",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "Success",
+                      "expression": "`Success`"
+                    },
+                    {
+                      "name": "Wind Speed (km/h)",
+                      "expression": "`Wind Speed (km/h)`"
+                    },
+                    {
+                      "name": "Highest Point (m)",
+                      "expression": "`Highest Point (m)`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Wind Speed and Highest Point Reached"
+              },
+              "widgetType": "scatter",
+              "encodings": {
+                "x": {
+                  "fieldName": "Wind Speed (km/h)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "Highest Point (m)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Success",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": false,
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 4
+                        }
+                      },
+                      {
+                        "value": true,
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 3
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 15,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "temperature-highest-point-reached",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0008342d",
+                  "fields": [
+                    {
+                      "name": "Success",
+                      "expression": "`Success`"
+                    },
+                    {
+                      "name": "Temperature (°C)",
+                      "expression": "`Temperature (°C)`"
+                    },
+                    {
+                      "name": "Highest Point (m)",
+                      "expression": "`Highest Point (m)`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Temperature and Highest Point Reached"
+              },
+              "widgetType": "scatter",
+              "encodings": {
+                "x": {
+                  "fieldName": "Temperature (°C)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "Highest Point (m)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Success",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": false,
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 4
+                        }
+                      },
+                      {
+                        "value": true,
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 3
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 15,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "0cd74174",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "b1cfba84",
+                  "fields": [
+                    {
+                      "name": "Success Rate %",
+                      "expression": "`Success Rate %`"
+                    },
+                    {
+                      "name": "Snowfall (cm)",
+                      "expression": "`Snowfall (cm)`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "scatter",
+              "encodings": {
+                "x": {
+                  "fieldName": "Snowfall (cm)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "Success Rate %",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Success Rate %",
+                  "scale": {
+                    "type": "quantitative",
+                    "colorRamp": {
+                      "mode": "scheme",
+                      "scheme": "greens"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 21,
+            "width": 12,
+            "height": 8
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
