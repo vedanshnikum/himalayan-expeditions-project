@@ -21,6 +21,7 @@ Incremental weather data is simulated by uploading historic weather files in bat
 | AWS S3 | Raw data lake and object storage |
 | Databricks Community Edition | ELT processing and dashboarding |
 | Delta Lake | ACID-compliant table storage |
+| Databricks Workflows | Pipeline orchestration |
 | Databricks Dashboard | BI reporting and visualisation |
 | Databricks Genie | Natural language querying |
 
@@ -80,7 +81,7 @@ himalayan-expeditions-project/
       explore_expeditions_peaks
       explore_weather
   dashboarding/
-    views                        ← SQL views for dashboard consumption
+    create_views                 ← SQL views for dashboard consumption
   configs/
     config                       ← S3 paths, dataset config
     credentials                  ← API keys (not pushed to GitHub)
@@ -135,9 +136,9 @@ Snowflake schema with one fact table and four dimension tables. All tables sourc
 | `dim_deaths` | Death records enriched with peak and expedition context |
 
 ### ✅ Stage 5 — Dashboarding
-Interactive visualisation via Databricks Dashboard and natural language querying via Databricks Genie. SQL views built in `dashboarding/views` serve as the consumption layer for all dashboard pages.
+Interactive visualisation via Databricks Dashboard and natural language querying via Databricks Genie. SQL views built in `dashboarding/create_views` serve as the consumption layer for all dashboard pages.
 
-The dashboard is split into five pages, each surfacing a different analytical lens:
+The dashboard is split into six pages, each surfacing a different analytical lens:
 
 **Overview**
 High-level summary of the full dataset — total expeditions, deaths, mountains, members, average success rate, and year range. Includes trend lines for expeditions by year, success vs failure by year, most climbed peaks, expeditions by season, and a combined expeditions vs deaths chart over time.
@@ -159,6 +160,42 @@ Weather impact on climbing outcomes — most common weather condition, average t
 
 ---
 
+## ⚙️ Orchestration
+
+The pipeline is orchestrated as a single Databricks Workflow with 15 tasks. The full load path and incremental weather path run in parallel from `catalog_setup`, merging back at the Gold layer before `create_views` runs at the end.
+
+```
+catalog_setup
+    ├── kaggle_to_s3
+    │       └── s3_to_bronze
+    │               ├── silver_expeditions_exped  ──┐
+    │               ├── silver_deaths             ──┤
+    │               ├── silver_expeditions_members──┼──► gold (x5) ──► create_views
+    │               └── silver_expeditions_peaks  ──┘        ▲
+    └── weather_to_bronze                                     │
+                └── silver_weather ──────────────────── gold_dim_weather
+```
+
+| Task | Notebook | Depends On |
+|---|---|---|
+| 1 | `catalog_setup` | — |
+| 2 | `kaggle_to_s3` | catalog_setup |
+| 3 | `s3_to_bronze` | kaggle_to_s3 |
+| 4 | `weather_to_bronze` | catalog_setup |
+| 5 | `silver_expeditions_exped` | s3_to_bronze |
+| 6 | `silver_deaths` | s3_to_bronze |
+| 7 | `silver_expeditions_members` | s3_to_bronze |
+| 8 | `silver_expeditions_peaks` | s3_to_bronze |
+| 9 | `silver_weather` | weather_to_bronze |
+| 10 | `gold_fact_expeditions` | tasks 5,6,7,8,9 |
+| 11 | `gold_dim_deaths` | tasks 5,6,7,8,9 |
+| 12 | `gold_dim_members` | tasks 5,6,7,8,9 |
+| 13 | `gold_dim_peaks` | tasks 5,6,7,8,9 |
+| 14 | `gold_dim_weather` | tasks 5,6,7,8,9 |
+| 15 | `create_views` | tasks 10,11,12,13,14 |
+
+---
+
 ## 💡 Key Design Decisions
 
 ### ELT over ETL
@@ -169,6 +206,9 @@ A dedicated IAM user was created for this project rather than using the AWS root
 
 ### Full load vs incremental ingestion
 Expedition and deaths datasets are static historical records loaded once from Kaggle. Weather data is ingested incrementally — new peak files are uploaded to S3 landing in batches, processed into Bronze, and merged into Silver. This simulates a real-world pipeline where new data arrives over time.
+
+### Single workflow with parallel branches
+Rather than maintaining two separate workflows, the full load and incremental weather paths are combined into one Databricks Workflow. Both branches originate from `catalog_setup` and converge at the Gold layer, giving a single view of the entire pipeline's run history and making all task dependencies explicit.
 
 ### Snowflake schema in Gold
 Gold follows a snowflake schema with `fact_expeditions` at the center referencing four dimension tables. `dim_deaths` is a child dimension of `dim_members`, linking via name and peakid. This structure supports flexible dashboard queries while maintaining clear separation of concerns between expedition outcomes, climber details, peak metadata, and weather conditions.
@@ -196,16 +236,14 @@ All dataset paths, Kaggle IDs, and S3 configuration live in a dedicated `config`
 
 ---
 
-## ⚙️ Setup
+## 🚀 Running the Pipeline
 
-1. Clone the repo
+Before the first run:
+
+1. Clone the repo into your Databricks workspace
 2. Create a `credentials` notebook in `configs/` with your Kaggle and AWS keys
-3. Update `config` notebook with your S3 bucket name
-4. Run `scripts/0_setup/catalog_setup` to create the Databricks catalog and schemas
-5. Run `scripts/0_setup/kaggle_to_s3` to ingest raw data into S3
-6. Run `scripts/1_bronze/full_load/s3_to_bronze` to load Bronze Delta tables
-7. Upload weather parquet files to `s3://himalaya-dp-vn/raw/incremental_load/historic-weather-data/landing/`
-8. Run `scripts/1_bronze/incremental/weather_to_bronze` to ingest weather batch
-9. Run Silver notebooks in `scripts/2_silver/` to clean and transform each table
-10. Run Gold notebooks in `scripts/3_gold/` to build dimension and fact tables
-11. Run `dashboarding/views` to create dashboard views
+3. Update the `config` notebook with your S3 bucket name
+4. Upload weather parquet files to `s3://himalaya-dp-vn/raw/incremental_load/historic-weather-data/landing/`
+5. Trigger the workflow from the Databricks Workflows UI
+
+All 15 tasks execute in dependency order. The full load and incremental weather branches run in parallel, converging at Gold before `create_views` finalises the dashboard consumption layer.
