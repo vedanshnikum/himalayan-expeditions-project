@@ -172,7 +172,7 @@ catalog_setup
     │               ├── silver_deaths             ──┤
     │               ├── silver_expeditions_members──┼──► gold (x5) ──► create_views
     │               └── silver_expeditions_peaks  ──┘        ▲
-    └── weather_to_bronze                                     │
+    └── weather_to_bronze                                    │
                 └── silver_weather ──────────────────── gold_dim_weather
 ```
 
